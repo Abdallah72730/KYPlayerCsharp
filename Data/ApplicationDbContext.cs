@@ -1,6 +1,7 @@
 ﻿using KYPlayer.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using KYPlayer.Areas.Identity.Data;
 
 namespace KYPlayer.Data
 {
@@ -34,7 +35,7 @@ namespace KYPlayer.Data
             builder.Entity<Rating>()
                 .HasOne(r => r.Fan)
                 .WithMany(u => u.Ratings)
-                .HasForeignKey(r => r.FanId);
+                .HasForeignKey(r => r.FanId);   
 
         }
     }

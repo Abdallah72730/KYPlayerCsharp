@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using KYPlayer.Areas.Identity.Data;
 
 namespace KYPlayer.Models
 {
