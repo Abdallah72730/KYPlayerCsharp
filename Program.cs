@@ -1,6 +1,7 @@
 using KYPlayer.Areas.Identity.Data;
 using KYPlayer.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,7 +33,31 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
+using (var scope = app.Services.CreateScope()) 
+{
+    var roleManager =
+        scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager =
+        scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+    string[] roles = { "Fan", "Admin" };
+
+    foreach (var role in roles) 
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+            await roleManager.CreateAsync(new IdentityRole(role));
+    }
+
+    var adminEmail = "admin@rdpolytech.ca";
+    if (await userManager.FindByEmailAsync(adminEmail) == null) 
+    {
+        var admin = new ApplicationUser { UserName = adminEmail, Email = adminEmail, Name = "Admin" };
+        await userManager.CreateAsync(admin, "Admin@1234");
+        await userManager.AddToRoleAsync(admin, "Admin");
+    }
+}
+
+    app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
