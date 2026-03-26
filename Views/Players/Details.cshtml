@@ -1,60 +1,52 @@
 ﻿@model KYPlayer.Models.Player
 
-@{
-    ViewData["Title"] = "Details";
-}
+<div class="row">
+    <div class="col-md-4">
+        <img src="@Model.PhotoURL" class="img-fluid rounded"/>
+    </div>
+    <div class="col-md-8">
+        <h2>#@Model.JerseyNumber @Model.PlayerName</h2>
+        <p>Position: @Model.Position | Age: @Model.Age</p>
+        <p>PSR: <strong>@Model.CurrentPSR.ToString("0.0")</strong>/5.0  (@Model.TotalRatingsCount ratings)</p>
 
-<h1>Details</h1>
-
-<div>
-    <h4>Player</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PlayerName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PlayerName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Age)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Age)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.JerseyNumber)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.JerseyNumber)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PhotoURL)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PhotoURL)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CurrentPSR)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CurrentPSR)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TotalRatingsCount)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TotalRatingsCount)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Position)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Position)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.PlayerId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+        @if (Model.Skills != null)
+        {
+            <h4>Skills</h4>
+            <div class="mb-1">Shooting
+                <div class="progress">
+                    <div class="progress-bar" style='@($"width:{Model.Skills.Shooting}%;")'>@Model.Skills.Shooting</div>
+                </div>
+            </div>
+            <div class="mb-1">Passing
+                <div class="progress">
+                    <div class="progress-bar" style='@($"width:{Model.Skills.Passing}%;")'>@Model.Skills.Passing</div>
+                </div>
+            </div>
+            <div class="mb-1">
+                Dribbling
+                <div class="progress">
+                    <div class="progress-bar" style='@($"width:{Model.Skills.Dribbling}%;")'>@Model.Skills.Dribbling</div>
+                </div>
+            </div>
+            <div class="mb-1">
+                Vision
+                <div class="progress">
+                    <div class="progress-bar" style='@($"width:{Model.Skills.Vision}%;")'>@Model.Skills.Vision</div>
+                </div>
+            </div>
+            <div class="mb-1">
+                Defense
+                <div class="progress">
+                    <div class="progress-bar" style='@($"width:{Model.Skills.Defense}%;")'>@Model.Skills.Defense</div>
+                </div>
+            </div>
+            <div class="mb-1">
+                Finishing
+                <div class="progress">
+                    <div class="progress-bar" style='@($"width:{Model.Skills.Finishing}%;")'>@Model.Skills.Finishing</div>
+                </div>
+            </div>
+                
+        }
+    </div>
 </div>
