@@ -48,5 +48,19 @@
             </div>
                 
         }
+
+
+        @if (User.Identity.IsAuthenticated && User.IsInRole("Fan"))
+        {
+            <h4>Rate this Player</h4>
+            <form asp-controller="Ratings" asp-action="Create" method="post">
+                <input type="hidden" name="PlayerId" value="@Model.PlayerId"/>
+                <select name="Value" class="form-select" w-auto d-inline>
+                    @for (int i = 1; i <= 5; i++) {<option value="@i">@i Star@(i>1?"s":"")</option> }
+                </select>
+                <button class="btn btn-warning ms-2">Submit Rating</button>
+
+            </form>
+        }
     </div>
 </div>
