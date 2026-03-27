@@ -1,4 +1,4 @@
-namespace KYPlayer.Models
+namespace KYPlayer.Models.ViewModels
 {
     public class ErrorViewModel
     {

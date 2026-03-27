@@ -57,7 +57,7 @@ using (var scope = app.Services.CreateScope())
     var adminEmail = "admin@rdpolytech.ca";
     if (await userManager.FindByEmailAsync(adminEmail) == null) 
     {
-        var admin = new ApplicationUser { UserName = adminEmail, Email = adminEmail, Name = "Admin" };
+        var admin = new ApplicationUser { UserName = adminEmail, Email = adminEmail, Name = "Admin", CollegeEmail = adminEmail };
         await userManager.CreateAsync(admin, "Admin@1234");
         await userManager.AddToRoleAsync(admin, "Admin");
     }
