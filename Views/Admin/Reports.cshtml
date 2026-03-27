@@ -1,0 +1,106 @@
+﻿@model IEnumerable<Player>
+@{
+    ViewData["Title"] = "Player Reports";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-0">&#128202; Player Reports</h2>
+        <small class="text-muted">Season PSR & Performance Summary</small>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">&#8592; Dashboard</a>
+</div>
+
+<!-- Top 3 Players Podium -->
+@{
+    var top3 = Model.Take(3).ToList();
+}
+@if (top3.Count >= 3)
+{
+    <div class="row g-3 mb-4">
+        @{
+            var medals = new[] { ("&#129351;", "#FFD700"), ("&#129352;", "#C0C0C0"), ("&#129353;", "#CD7F32") };
+        }
+        @for (int idx = 0; idx < top3.Count; idx++)
+        {
+            var pl = top3[idx];
+            <div class="col-md-4">
+                <div class="card text-center shadow-sm" style="border-top:4px solid @medals[idx].Item2;">
+                    <div class="card-body">
+                        <div style="font-size:2rem;">@Html.Raw(medals[idx].Item1)</div>
+                        <img src="@(pl.PhotoURL ?? "/images/default-player.png")"
+                             style="width:60px;height:60px;border-radius:50%;object-fit:cover;" />
+                        <h6 class="fw-bold mt-2 mb-0">#@pl.JerseyNumber @pl.PlayerName</h6>
+                        <small class="text-muted">@pl.Position</small>
+                        <div class="mt-2">
+                            <span class="badge bg-warning text-dark fs-6">
+                                @pl.CurrentPSR.ToString("0.00") PSR
+                            </span>
+                        </div>
+                        <small class="text-muted">@pl.TotalRatingsCount ratings</small>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<!-- Full Report Table -->
+<div class="card shadow-sm">
+    <div class="card-header fw-bold">Full Season Report</div>
+    <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Rank</th>
+                    <th>Player</th>
+                    <th>Position</th>
+                    <th>PSR</th>
+                    <th>Ratings Count</th>
+                    <th>Avg. Skill</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int rank = 1;
+                }
+                @foreach (var p in Model)
+                {
+                    <tr>
+                        <td><span class="badge bg-secondary">@rank++</span></td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="@(p.PhotoURL ?? "/images/default-player.png")"
+                                     style="width:36px;height:36px;border-radius:50%;object-fit:cover;" />
+                                <div>
+                                    <div class="fw-bold">#@p.JerseyNumber @p.PlayerName</div>
+                                    <small class="text-muted">Age @p.Age</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>@p.Position</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width:80px;background:#eee;border-radius:4px;height:8px;">
+                                    <div style="width:@(p.CurrentPSR * 20)%;background:#f39c12;height:100%;border-radius:4px;"></div>
+                                </div>
+                                <strong>@p.CurrentPSR.ToString("0.0")</strong>
+                            </div>
+                        </td>
+                        <td>@p.TotalRatingsCount</td>
+                        <td>@(p.Skills?.AverageSkillRating.ToString("0.0") ?? "N/A")</td>
+                        <td>
+                            <form asp-action="GenerateReport" method="post" class="d-inline">
+                                <input type="hidden" name="playerId" value="@p.PlayerId" />
+                                <button class="btn btn-sm btn-outline-primary">&#128190; Save Report</button>
+                            </form>
+                            <a asp-controller="Players" asp-action="Details" asp-route-id="@p.PlayerId"
+                               class="btn btn-sm btn-outline-secondary">View Card</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
