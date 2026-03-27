@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using KYPlayer.Data;
 using KYPlayer.Models;
 using Microsoft.AspNetCore.Authorization;
+using KYPlayer.Models.ViewModels;
 
 namespace KYPlayer.Controllers
 {
@@ -46,24 +47,45 @@ namespace KYPlayer.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public IActionResult Create() => View();
+        public IActionResult Create() { return View(new PlayerCreateViewModel()); }
 
 
         // POST: Players/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles ="Admin")]
-        public async Task<IActionResult> Create([Bind("PlayerId,PlayerName,Age,JerseyNumber,PhotoURL,CurrentPSR,TotalRatingsCount,Position")] Player player)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create(PlayerCreateViewModel vm)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Add(player);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return View(vm);
             }
-            return View(player);
+
+            var player = new Player
+            {
+                PlayerName = vm.PlayerName,
+                Age = vm.Age,
+                JerseyNumber = vm.JerseyNumber,
+                Position = vm.Position,
+                PhotoURL = vm.PhotoURL ?? "/images/default-player.png",
+                CurrentPSR = 0,    
+                TotalRatingsCount = 0,
+                Skills = new PlayerSkills
+                {
+                    Shooting = vm.Shooting,
+                    Passing = vm.Passing,
+                    Dribbling = vm.Dribbling,
+                    Vision = vm.Vision,
+                    Defense = vm.Defense,
+                    Finishing = vm.Finishing,
+                }
+
+            };
+
+            _context.Players.Add(player);
+            await _context.SaveChangesAsync();
+            TempData["Success"] = $"{player.PlayerName} has been added to the squad!";
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Players/Edit/5
@@ -75,48 +97,82 @@ namespace KYPlayer.Controllers
                 return NotFound();
             }
 
-            var player = await _context.Players.FindAsync(id);
+            var player = await _context.Players.Include(p => p.Skills).FirstOrDefaultAsync(p => p.PlayerId == id);
             if (player == null)
             {
                 return NotFound();
             }
-            return View(player);
+
+
+            var vm = new PlayerEditViewModel 
+            {
+                PlayerId = player.PlayerId,
+                PlayerName = player.PlayerName,
+                Age = player.Age,
+                JerseyNumber = player.JerseyNumber,
+                Position = player.Position,
+                PhotoURL = player.PhotoURL,
+                CurrentPSR = player.CurrentPSR,
+                TotalRatingsCount = player.TotalRatingsCount,
+                Shooting = player.Skills?.Shooting ?? 50,
+                Passing = player.Skills?.Passing ?? 50,
+                Dribbling = player.Skills?.Dribbling ?? 50,
+                Vision = player.Skills?.Vision ?? 50,
+                Defense = player.Skills?.Defense ?? 50,
+                Finishing = player.Skills?.Finishing ?? 50,
+
+            };
+
+            return View(vm);
         }
 
         // POST: Players/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles ="Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("PlayerId,PlayerName,Age,JerseyNumber,PhotoURL,CurrentPSR,TotalRatingsCount,Position")] Player player)
+        public async Task<IActionResult> Edit(int id, PlayerEditViewModel vm)
         {
-            if (id != player.PlayerId)
+            if (id != vm.PlayerId)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(player);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PlayerExists(player.PlayerId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+               return View(vm);
             }
-            return View(player);
+
+
+            var player = await _context.Players.Include(p => p.Skills).FirstOrDefaultAsync(p => p.PlayerId == id);
+
+            if (player == null) return NotFound();
+
+            player.PlayerName = vm.PlayerName;
+            player.Age = vm.Age;
+            player.JerseyNumber = vm.JerseyNumber;
+            player.Position = vm.Position;
+            player.PhotoURL = vm.PhotoURL ?? player.PhotoURL;
+
+
+            if (player.Skills == null) 
+            {
+                player.Skills = new PlayerSkills { PlayerId = player.PlayerId };
+            }
+
+
+            player.Skills.Shooting = vm.Shooting;
+            player.Skills.Passing = vm.Passing;
+            player.Skills.Dribbling = vm.Dribbling;
+            player.Skills.Vision = vm.Vision;
+            player.Skills.Defense = vm.Defense;
+            player.Skills.Finishing = vm.Finishing;
+
+            _context.Update(player);
+            await _context.SaveChangesAsync();
+            TempData["Success"] = $"{player.PlayerName} updated successfully.";
+            return RedirectToAction(nameof(Index));
+
+
         }
 
         // GET: Players/Delete/5

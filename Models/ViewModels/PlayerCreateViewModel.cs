@@ -7,7 +7,7 @@ namespace KYPlayer.Models.ViewModels
         [Required(ErrorMessage = "Player name is required")]
         [StringLength(100)]
         [Display(Name = "Full Name")]
-        public string PLayerName { get; set; }
+        public string PlayerName { get; set; }
 
 
         [Required]
