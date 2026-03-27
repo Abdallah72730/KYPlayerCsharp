@@ -11,42 +11,114 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">KYPlayer</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+        <!-- ── NAVBAR ─────────────────────────────────────────── -->
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background:#1F5C99;">
+            <div class="container">
+                <a class="navbar-brand fw-bold fs-4" asp-controller="Home" asp-action="Index">
+                    &#9917; KYPlayer
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarMain">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="collapse navbar-collapse" id="navbarMain">
+                    <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Players" asp-action="Index">Players</a>
+                            <a class="nav-link" asp-controller="Players" asp-action="Index">
+                                &#127760; Squad
+                            </a>
                         </li>
-
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Admin</a>
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                                    &#9881;&#65039; Admin
+                                </a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="Ratings">Moderate Ratings</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="Users">Manage Users</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="Reports">Player Reports</a></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Admin" asp-action="Index">
+                                            &#128202; Dashboard
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Players" asp-action="Create">
+                                            &#43; Add Player
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Admin" asp-action="Ratings">
+                                            &#9998; Moderate Ratings
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Admin" asp-action="Users">
+                                            &#128100; Manage Users
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Admin" asp-action="Reports">
+                                            &#128190; Player Reports
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                         }
-
+                    </ul>
+                    <ul class="navbar-nav">
+                        @if (User.Identity!.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link text-white-50">
+                                    &#128075; @User.Identity.Name
+                                </span>
+                            </li>
+                            <li class="nav-item">
+                                <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
+                                    <button class="btn btn-sm btn-outline-light ms-2">Logout</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-light btn-sm ms-2 fw-bold"
+                                   asp-area="Identity" asp-page="/Account/Register">Register</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
         </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+
+        <!-- ── TEMPDATA ALERTS ──────────────────────────────────── -->
+        <div class="container mt-3">
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    &#10003; @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    &#9888; @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+        </div>
+
+        <!-- ── MAIN CONTENT ──────────────────────────────────────── -->
+        <main class="container py-4">
             @RenderBody()
         </main>
-    </div>
 
+    </header>
+ 
     <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2026 - KYPlayer - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
