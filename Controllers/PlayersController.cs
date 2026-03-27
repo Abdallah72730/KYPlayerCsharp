@@ -23,10 +23,33 @@ namespace KYPlayer.Controllers
         }
 
         // GET: Players
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchQuery, string positionFilter, string sortBy)
         {
-            return View(await _context.Players.ToListAsync());
+            var players = _context.Players.Include(p => p.Skills).AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchQuery))
+                players = players.Where(p =>
+                    p.PlayerName.Contains(searchQuery) ||
+                    p.JerseyNumber.ToString().Contains(searchQuery));
+
+            if (!string.IsNullOrEmpty(positionFilter))
+                players = players.Where(p => p.Position == positionFilter);
+
+            players = sortBy switch
+            {
+                "psr_desc" => players.OrderByDescending(p => p.CurrentPSR),
+                "psr_asc" => players.OrderBy(p => p.CurrentPSR),
+                "name" => players.OrderBy(p => p.PlayerName),
+                "jersey" => players.OrderBy(p => p.JerseyNumber),
+                _ => players.OrderByDescending(p => p.CurrentPSR), // default
+            };
+
+            ViewData["SearchQuery"] = searchQuery;
+            ViewData["PositionFilter"] = positionFilter;
+            ViewData["SortBy"] = sortBy;
+            return View(await players.ToListAsync());
         }
+
 
         // GET: Players/Details/5
         public async Task<IActionResult> Details(int? id)

@@ -1,66 +1,138 @@
-﻿@model KYPlayer.Models.Player
+﻿@model Player
+@{
+    ViewData["Title"] = Model.PlayerName;
+}
 
-<div class="row">
-    <div class="col-md-4">
-        <img src="@Model.PhotoURL" class="img-fluid rounded"/>
-    </div>
-    <div class="col-md-8">
-        <h2>#@Model.JerseyNumber @Model.PlayerName</h2>
-        <p>Position: @Model.Position | Age: @Model.Age</p>
-        <p>PSR: <strong>@Model.CurrentPSR.ToString("0.0")</strong>/5.0  (@Model.TotalRatingsCount ratings)</p>
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="card shadow-lg" style="border-radius:20px; overflow:hidden; border:none;">
 
-        @if (Model.Skills != null)
-        {
-            <h4>Skills</h4>
-            <div class="mb-1">Shooting
-                <div class="progress">
-                    <div class="progress-bar" style='@($"width:{Model.Skills.Shooting}%;")'>@Model.Skills.Shooting</div>
+            <!-- Hero Banner -->
+            <div style="background:linear-gradient(135deg,#1F5C99,#0d2f52); padding:40px 30px; position:relative;">
+                <a asp-action="Index" class="btn btn-sm btn-light" style="position:absolute;top:16px;left:16px;">
+                    &#8592; Back to Squad
+                </a>
+                <div class="d-flex align-items-center gap-4">
+                    <div>
+                        <img src="@(Model.PhotoURL ?? "/images/default-player.png")"
+                             style="width:140px;height:140px;border-radius:50%;object-fit:cover;
+                     border:5px solid #fff;box-shadow:0 6px 20px rgba(0,0,0,0.4);" />
+                    </div>
+                    <div class="text-white">
+                        <div style="font-size:4rem;font-weight:900;line-height:1;opacity:0.3;">
+                            #@Model.JerseyNumber
+                        </div>
+                        <h2 style="font-weight:800;margin:-10px 0 4px;">@Model.PlayerName</h2>
+                        <span class="badge bg-light text-dark me-2">@Model.Position</span>
+                        <span class="badge" style="background:rgba(255,255,255,0.2);">Age @Model.Age</span>
+                        <div class="mt-2">
+                            @{
+                                int full = (int)Math.Round((double)Model.CurrentPSR);
+                            }
+                            @for (int i = 0; i < full; i++)
+                            {
+                                <span style="color:#f39c12;font-size:1.3rem;">&#9733;</span>
+                            }
+                            @for (int i = 0; i < 5 - full; i++)
+                            {
+                                <span style="color:rgba(255,255,255,0.3);font-size:1.3rem;">&#9733;</span>
+                            }
+                            <span class="ms-2" style="opacity:0.8;">
+                                @Model.CurrentPSR.ToString("0.0") / 5.0
+                                &bull; @Model.TotalRatingsCount ratings
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="mb-1">Passing
-                <div class="progress">
-                    <div class="progress-bar" style='@($"width:{Model.Skills.Passing}%;")'>@Model.Skills.Passing</div>
-                </div>
-            </div>
-            <div class="mb-1">
-                Dribbling
-                <div class="progress">
-                    <div class="progress-bar" style='@($"width:{Model.Skills.Dribbling}%;")'>@Model.Skills.Dribbling</div>
-                </div>
-            </div>
-            <div class="mb-1">
-                Vision
-                <div class="progress">
-                    <div class="progress-bar" style='@($"width:{Model.Skills.Vision}%;")'>@Model.Skills.Vision</div>
-                </div>
-            </div>
-            <div class="mb-1">
-                Defense
-                <div class="progress">
-                    <div class="progress-bar" style='@($"width:{Model.Skills.Defense}%;")'>@Model.Skills.Defense</div>
-                </div>
-            </div>
-            <div class="mb-1">
-                Finishing
-                <div class="progress">
-                    <div class="progress-bar" style='@($"width:{Model.Skills.Finishing}%;")'>@Model.Skills.Finishing</div>
-                </div>
-            </div>
-                
-        }
 
+            <div class="card-body p-4">
+                <div class="row">
 
-        @if (User.Identity.IsAuthenticated && User.IsInRole("Fan"))
-        {
-            <h4>Rate this Player</h4>
-            <form asp-controller="Ratings" asp-action="Create" method="post">
-                <input type="hidden" name="PlayerId" value="@Model.PlayerId"/>
-                <select name="Value" class="form-select" w-auto d-inline>
-                    @for (int i = 1; i <= 5; i++) {<option value="@i">@i Star@(i>1?"s":"")</option> }
-                </select>
-                <button class="btn btn-warning ms-2">Submit Rating</button>
+                    <!-- Left: All Skills -->
+                    <div class="col-md-6">
+                        <h5 class="fw-bold text-primary mb-3">&#127919; Player Skills</h5>
+                        @if (Model.Skills != null)
+                        {
+                            @foreach (var skill in new[] {
+                                                ("Shooting",  Model.Skills.Shooting,  "#e74c3c"),
+                                                ("Passing",   Model.Skills.Passing,   "#3498db"),
+                                                ("Dribbling", Model.Skills.Dribbling, "#2ecc71"),
+                                                ("Vision",    Model.Skills.Vision,    "#9b59b6"),
+                                                ("Defense",   Model.Skills.Defense,   "#e67e22"),
+                                                ("Finishing", Model.Skills.Finishing, "#e74c3c") })
+                            {
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="fw-bold" style="font-size:0.85rem;">@skill.Item1</span>
+                                        <span class="fw-bold" style="color:@skill.Item3;">@skill.Item2</span>
+                                    </div>
+                                    <div style="background:#eee;border-radius:8px;height:10px;">
+                                        <div style="width:@(skill.Item2)%;background:@skill.Item3;
+                                     height:100%;border-radius:8px;
+                                     transition:width 1s ease;"></div>
+                                    </div>
+                                </div>
+                            }
+                            <div class="mt-3 p-2 rounded" style="background:#f8f9fa;">
+                                <small class="text-muted">Overall Skill Rating</small>
+                                <div class="fw-bold fs-5 text-primary">
+                                    @Model.Skills.AverageSkillRating.ToString("0.0") / 100
+                                </div>
+                            </div>
+                        }
+                    </div>
 
-            </form>
-        }
+                    <!-- Right: Rate Player -->
+                    <div class="col-md-6">
+                        <h5 class="fw-bold text-primary mb-3">&#9733; Fan Rating (PSR)</h5>
+
+                        @if (!User.Identity!.IsAuthenticated)
+                        {
+                            <div class="alert alert-info">
+                                <a asp-area="Identity" asp-page="/Account/Login">Login</a> to rate this player.
+                            </div>
+                        }
+                        else if (User.IsInRole("Fan"))
+                        {
+                            @if (TempData["Error"] != null)
+                            {
+                                <div class="alert alert-warning">@TempData["Error"]</div>
+                            }
+                            @if (TempData["Success"] != null)
+                            {
+                                <div class="alert alert-success">@TempData["Success"]</div>
+                            }
+
+                            <form asp-controller="Ratings" asp-action="Create" method="post">
+                                <input type="hidden" name="playerId" value="@Model.PlayerId" />
+                                <p class="text-muted small">How would you rate this player's performance?</p>
+                                <div class="d-flex gap-2 mb-3">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <div>
+                                            <input type="radio" class="btn-check" name="value"
+                                                   id="star@i" value="@i" required />
+                                            <label class="btn btn-outline-warning" for="star@i">
+                                                @i &#9733;
+                                            </label>
+                                        </div>
+                                    }
+                                </div>
+                                <button class="btn btn-warning fw-bold px-4">Submit Rating</button>
+                            </form>
+                        }
+                        else if (User.IsInRole("Admin"))
+                        {
+                            <div class="alert alert-secondary">
+                                Admins do not rate players. Ratings come from fans.
+                            </div>
+                            <a asp-controller="Players" asp-action="Edit" asp-route-id="@Model.PlayerId"
+                               class="btn btn-outline-warning">&#9998; Edit This Player</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

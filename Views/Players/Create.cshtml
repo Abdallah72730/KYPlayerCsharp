@@ -1,53 +1,92 @@
-﻿@model KYPlayer.Models.Player
-
+﻿@model KYPlayer.Models.ViewModels.PlayerCreateViewModel
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Add Player";
 }
 
-<h1>Create</h1>
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">&#43; Add New Player</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-<h4>Player</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="PlayerName" class="control-label"></label>
-                <input asp-for="PlayerName" class="form-control" />
-                <span asp-validation-for="PlayerName" class="text-danger"></span>
+                    <!-- Player Info -->
+                    <h5 class="text-primary border-bottom pb-2 mb-3">Player Information</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="PlayerName" class="form-label fw-bold"></label>
+                            <input asp-for="PlayerName" class="form-control" placeholder="e.g. Cristiano Ronaldo" />
+                            <span asp-validation-for="PlayerName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-3">
+                            <label asp-for="JerseyNumber" class="form-label fw-bold"></label>
+                            <input asp-for="JerseyNumber" class="form-control" type="number" min="1" max="99" />
+                            <span asp-validation-for="JerseyNumber" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-3">
+                            <label asp-for="Age" class="form-label fw-bold"></label>
+                            <input asp-for="Age" class="form-control" type="number" min="15" max="45" />
+                            <span asp-validation-for="Age" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Position" class="form-label fw-bold"></label>
+                            <select asp-for="Position" class="form-select">
+                                <option value="">-- Select Position --</option>
+                                @foreach (var pos in new[] { "Goalkeeper", "Defender", "Midfielder", "Forward" })
+                                {
+                                    <option>@pos</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Position" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="PhotoURL" class="form-label fw-bold"></label>
+                            <input asp-for="PhotoURL" class="form-control" placeholder="https://..." />
+                            <span asp-validation-for="PhotoURL" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Skills Section -->
+                    <h5 class="text-primary border-bottom pb-2 mt-4 mb-3">Player Skills (1 - 100)</h5>
+                    <p class="text-muted small mb-3">
+                        Rate each skill from 1 (very weak) to 100 (world class).
+                        The PSR is set separately by fans through ratings.
+                    </p>
+                    <div class="row g-3">
+                        @foreach (var skill in new[] {
+                                                ("Shooting","&#127919;"), ("Passing","&#128257;"),
+                                                ("Dribbling","&#9917;"), ("Vision","&#128065;"),
+                                                ("Defense","&#129354;"), ("Finishing","&#127919;") })
+                        {
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">@skill.Item2 @skill.Item1</label>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="range" name="@skill.Item1" min="1" max="100"
+                                           class="form-range flex-grow-1" value="50"
+                                           oninput="document.getElementById('lbl_@skill.Item1').innerText=this.value" />
+                                    <span id="lbl_@skill.Item1" class="badge bg-primary" style="min-width:40px">50</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-success px-5 fw-bold">Save Player</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label asp-for="Age" class="control-label"></label>
-                <input asp-for="Age" class="form-control" />
-                <span asp-validation-for="Age" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="JerseyNumber" class="control-label"></label>
-                <input asp-for="JerseyNumber" class="form-control" />
-                <span asp-validation-for="JerseyNumber" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PhotoURL" class="control-label"></label>
-                <input asp-for="PhotoURL" class="form-control" />
-                <span asp-validation-for="PhotoURL" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Position" class="control-label"></label>
-                <input asp-for="Position" class="form-control" />
-                <span asp-validation-for="Position" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
 }
