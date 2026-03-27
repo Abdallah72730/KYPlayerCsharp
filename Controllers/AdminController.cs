@@ -1,6 +1,7 @@
 ﻿using KYPlayer.Areas.Identity.Data;
 using KYPlayer.Data;
 using KYPlayer.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,28 @@ namespace KYPlayer.Controllers
         public AdminController(ApplicationDbContext context,
                                UserManager<ApplicationUser> userManager)
         { _context = context; _userManager = userManager; }
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Index()
+        {
+            var vm = new AdminDashboardViewModel
+            {
+                TotalPlayers = await _context.Players.CountAsync(),
+                TotalFans = (await _userManager.GetUsersInRoleAsync("Fan")).Count,
+                TotalRatings = await _context.Ratings.CountAsync(),
+                TopPlayer = await _context.Players
+                                     .OrderByDescending(p => p.CurrentPSR)
+                                     .FirstOrDefaultAsync(),
+                RecentRatings = await _context.Ratings
+                                     .Include(r => r.Player)
+                                     .Include(r => r.Fan)
+                                     .OrderByDescending(r => r.Timestamp)
+                                     .Take(5)
+                                     .ToListAsync()
+            };
+            return View(vm);
+        }
+
 
         //Moderate Ratings
         public async Task<IActionResult> Ratings()
