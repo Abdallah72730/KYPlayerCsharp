@@ -11,11 +11,11 @@
 </head>
 <body>
     <header>
-        <!-- ── NAVBAR ─────────────────────────────────────────── -->
+        <!--NAVBAR-->
         <nav class="navbar navbar-expand-lg navbar-dark" style="background:#1F5C99;">
             <div class="container">
-                <a class="navbar-brand fw-bold fs-4" asp-controller="Home" asp-action="Index">
-                    &#9917; KYPlayer
+                <a class="navbar-brand fw-bold fs-4" asp-controller="Players" asp-action="Index">
+                    KYPlayer
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navbarMain">
@@ -32,12 +32,12 @@
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                                    &#9881;&#65039; Admin
+                                    Admin
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>
                                         <a class="dropdown-item" asp-controller="Admin" asp-action="Index">
-                                            &#128202; Dashboard
+                                            Dashboard
                                         </a>
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
@@ -70,7 +70,7 @@
                         {
                             <li class="nav-item">
                                 <span class="nav-link text-white-50">
-                                    &#128075; @User.Identity.Name
+                                    @User.Identity.Name
                                 </span>
                             </li>
                             <li class="nav-item">
@@ -94,7 +94,7 @@
             </div>
         </nav>
 
-        <!-- ── TEMPDATA ALERTS ──────────────────────────────────── -->
+        <!-- TEMPDATA ALERTS  -->
         <div class="container mt-3">
             @if (TempData["Success"] != null)
             {
@@ -115,7 +115,7 @@
        
 
     </header>
-    <!-- ── MAIN CONTENT ──────────────────────────────────────── -->
+    <!-- MAIN CONTENT-->
     <main class="container py-4">
         @RenderBody()
     </main>

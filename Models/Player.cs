@@ -12,7 +12,7 @@ namespace KYPlayer.Models
 
         public int Age { get; set; }
         public int JerseyNumber { get; set; }
-        public string PhotoURL { get; set; }
+        public string? PhotoURL { get; set; }
         public float CurrentPSR { get; set; }
         public int TotalRatingsCount { get; set; }
         public string Position { get; set; }

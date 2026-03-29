@@ -2,6 +2,16 @@
 @{
     ViewData["Title"] = Model.PlayerName;
 }
+@if (!User.Identity!.IsAuthenticated)
+{
+    <div class="alert alert-info">
+        <a asp-area="Identity" asp-page="/Account/Login">Login</a>
+        to rate this player.
+    </div>
+}
+
+
+
 
 <div class="row justify-content-center">
     <div class="col-lg-9">
@@ -14,7 +24,7 @@
                 </a>
                 <div class="d-flex align-items-center gap-4">
                     <div>
-                        <img src="@(Model.PhotoURL ?? "/images/default-player.png")"
+                        <img src="@(Model.PhotoURL ?? "/images/newProfileImage.png")"
                              style="width:140px;height:140px;border-radius:50%;object-fit:cover;
                      border:5px solid #fff;box-shadow:0 6px 20px rgba(0,0,0,0.4);" />
                     </div>
@@ -51,7 +61,7 @@
 
                     <!-- Left: All Skills -->
                     <div class="col-md-6">
-                        <h5 class="fw-bold text-primary mb-3">&#127919; Player Skills</h5>
+                        <h5 class="fw-bold text-primary mb-3">Player Skills</h5>
                         @if (Model.Skills != null)
                         {
                             @foreach (var skill in new[] {
@@ -85,50 +95,63 @@
 
                     <!-- Right: Rate Player -->
                     <div class="col-md-6">
-                        <h5 class="fw-bold text-primary mb-3">&#9733; Fan Rating (PSR)</h5>
+                        <h5 class="fw-bold text-primary mb-3">Fan Rating (PSR)</h5>
 
                         @if (!User.Identity!.IsAuthenticated)
                         {
                             <div class="alert alert-info">
-                                <a asp-area="Identity" asp-page="/Account/Login">Login</a> to rate this player.
+                                <a asp-area="Identity" asp-page="/Account/Login">Login</a>
+                                to rate this player.
                             </div>
                         }
                         else if (User.IsInRole("Fan"))
                         {
-                            @if (TempData["Error"] != null)
+                            @if ((bool?)ViewData["AlreadyRated"] == true)
                             {
-                                <div class="alert alert-warning">@TempData["Error"]</div>
-                            }
-                            @if (TempData["Success"] != null)
-                            {
-                                <div class="alert alert-success">@TempData["Success"]</div>
-                            }
-
-                            <form asp-controller="Ratings" asp-action="Create" method="post">
-                                <input type="hidden" name="playerId" value="@Model.PlayerId" />
-                                <p class="text-muted small">How would you rate this player's performance?</p>
-                                <div class="d-flex gap-2 mb-3">
-                                    @for (int i = 1; i <= 5; i++)
-                                    {
-                                        <div>
-                                            <input type="radio" class="btn-check" name="value"
-                                                   id="star@i" value="@i" required />
-                                            <label class="btn btn-outline-warning" for="star@i">
-                                                @i &#9733;
-                                            </label>
-                                        </div>
-                                    }
+                                <div class="alert alert-success d-flex align-items-center gap-3">
+                                    <div>
+                                        <strong>You've rated this player!</strong><br />
+                                        @{
+                                            int myRating = (int)(ViewData["ExistingRatingValue"] ?? 0);
+                                        }
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <span style="color:@(i <= myRating ? "#f39c12" : "#ddd"); font-size:1.5rem;">★</span>
+                                        }
+                                        <br /><small class="text-muted">Thank you for your vote.</small>
+                                    </div>
                                 </div>
-                                <button class="btn btn-warning fw-bold px-4">Submit Rating</button>
-                            </form>
+                            }
+                            else
+                            {
+                                <form asp-controller="Ratings" asp-action="Create" method="post">
+                                    <input type="hidden" name="playerId" value="@Model.PlayerId" />
+                                    <p class="text-muted small mb-2">
+                                        How would you rate @Model.PlayerName's performance?
+                                    </p>
+
+                                    <!-- CSS Star Rating -->
+                                    <div class="star-rating mb-3">
+                                        @for (int i = 5; i >= 1; i--)
+                                        {
+                                            <input type="radio" name="value"
+                                                   id="@($"star{i}")"
+                                                   value="@i" required />
+                                            <label for="@($"star{i}")">★</label>
+                                        }
+                                    </div>
+
+                                    <button class="btn btn-warning fw-bold px-4">Submit Rating</button>
+                                </form>
+                            }
                         }
                         else if (User.IsInRole("Admin"))
                         {
                             <div class="alert alert-secondary">
-                                Admins do not rate players. Ratings come from fans.
+                                Admins do not rate players. Ratings come from fans only.
                             </div>
                             <a asp-controller="Players" asp-action="Edit" asp-route-id="@Model.PlayerId"
-                               class="btn btn-outline-warning">&#9998; Edit This Player</a>
+                               class="btn btn-outline-warning">Edit This Player</a>
                         }
                     </div>
                 </div>

@@ -1,108 +1,156 @@
 ﻿@model Player
 
-<div class="player-card shadow" style="
-    border-radius: 16px; overflow: hidden;
-    background: #fff; border: none;">
+<div style="width:100%; border-radius:16px; overflow:hidden;
+            border:0.5px solid #e0e0e0; background:#fff;
+            transition:transform 0.2s ease, box-shadow 0.2s ease;
+            font-family: Arial, sans-serif;"
+     onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(0,0,0,0.12)'"
+     onmouseleave="this.style.transform='translateY(0)';this.style.boxShadow='none'">
 
-    <!-- Card Header — Jersey Banner -->
-    <div style="
-    background: linear-gradient(135deg, #1F5C99 0%, #0d2f52 100%);
-    padding: 20px 16px 50px; position: relative;">
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#1F5C99 0%,#0d2f52 100%);
+                padding:16px 16px 14px; position:relative; overflow:hidden;">
 
-        <!-- Jersey Number (top-left) -->
-        <span style="
-      position:absolute; top:12px; left:16px;
-      font-size:2.2rem; font-weight:900;
-      color:rgba(255,255,255,0.2); line-height:1;">
-            #@Model.JerseyNumber
-        </span>
+        <!-- Ghost jersey number -->
+        <div style="position:absolute; right:6px; bottom:-14px;
+                    font-size:90px; font-weight:900; line-height:1;
+                    color:rgba(255,255,255,0.06); user-select:none;
+                    pointer-events:none;">
+            @Model.JerseyNumber
+        </div>
 
-        <!-- Position Badge (top-right) -->
-        <span class="badge" style="
-      position:absolute; top:14px; right:14px;
-      background:rgba(255,255,255,0.15);
-      color:#fff; font-size:0.7rem; letter-spacing:1px;">
-            @Model.Position?.ToUpper()
-        </span>
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; position:relative;">
 
-        <!-- Player Photo (centred, overlapping) -->
-        <div style="text-align:center;">
-            <img src="@(Model.PhotoURL ?? "/images/default-player.png")"
-                 alt="@Model.PlayerName"
-                 style="width:100px; height:100px; border-radius:50%;
-                  object-fit:cover; border:4px solid #fff;
-                  position:relative; bottom:-32px; box-shadow:0 4px 12px rgba(0,0,0,0.3);" />
+            <!-- Left: Photo + Name + Position -->
+            <div>
+                <div style="display:flex; align-items:center; gap:6px; margin-bottom:3px;">
+                    <span style="font-size:9px; letter-spacing:1px;
+                                 color:rgba(255,255,255,0.5);">
+                        @Model.Position?.ToUpper()
+                    </span>
+                    <span style="color:rgba(255,255,255,0.2); font-size:9px;">·</span>
+                    <span style="font-size:9px; letter-spacing:1px;
+                                 color:rgba(255,255,255,0.5);">
+                        #@Model.JerseyNumber
+                    </span>
+                </div>
+
+                <div style="font-size:15px; font-weight:700; color:#fff;
+                            margin-bottom:2px; letter-spacing:0.2px;">
+                    @Model.PlayerName
+                </div>
+                <div style="font-size:11px; color:rgba(255,255,255,0.4);
+                            margin-bottom:10px;">
+                    Age @Model.Age
+                </div>
+
+                <!-- Photo -->
+                <div style="width:54px; height:54px; border-radius:10px;
+            overflow:hidden; border:2px solid rgba(255,255,255,0.15);">
+                    <img src="@(!string.IsNullOrEmpty(Model.PhotoURL)
+                                     ? Model.PhotoURL
+                                     : Url.Content("~/images/newProfileImage.png"))"
+                         alt="@Model.PlayerName"
+                         style="width:100%; height:100%; object-fit:cover; display:block;" />
+                </div>
+            </div>
+
+            <!-- Right: Overall + PSR -->
+            <div style="text-align:center; min-width:70px;">
+                <div style="font-size:52px; font-weight:900; color:#fff;
+                            line-height:1; letter-spacing:-2px;">
+                    @(Model.Skills != null ? ((int)Model.Skills.AverageSkillRating).ToString() : "—")
+                </div>
+                <div style="font-size:9px; letter-spacing:1px;
+                            color:rgba(255,255,255,0.35); margin-top:1px;">
+                    OVERALL
+                </div>
+
+                <!-- PSR Stars -->
+                <div style="margin-top:10px;">
+                    @{
+                        int fullStars = (int)Math.Round((double)Model.CurrentPSR);
+                    }
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <span style="font-size:13px; color:@(i <= fullStars ? "#e8a020" : "rgba(255,255,255,0.2)");">★</span>
+                    }
+                    <div style="font-size:9px; color:rgba(255,255,255,0.35);
+                                margin-top:2px; letter-spacing:0.5px;">
+                        @Model.CurrentPSR.ToString("0.0") PSR
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- Card Body -->
-    <div style="padding: 40px 20px 16px; text-align:center;">
-
-        <!-- Name -->
-        <h5 style="font-weight:800; font-size:1.1rem; margin-bottom:2px; color:#1a1a2e;">
-            @Model.PlayerName
-        </h5>
-        <small class="text-muted">Age @Model.Age</small>
-
-        <!-- PSR Stars -->
-        <div style="margin: 10px 0;">
-            @{
-                int fullStars = (int)Math.Round((double)Model.CurrentPSR);
-                int emptyStars = 5 - fullStars;
-            }
-            @for (int i = 0; i < fullStars; i++)
-            {
-                <span style="color:#f39c12; font-size:1.1rem;">&#9733;</span>
-            }
-            @for (int i = 0; i < emptyStars; i++)
-            {
-                <span style="color:#ddd; font-size:1.1rem;">&#9733;</span>
-            }
-            <br />
-            <small class="text-muted">
-                @Model.CurrentPSR.ToString("0.0") PSR
-                &bull; @Model.TotalRatingsCount rating@(Model.TotalRatingsCount != 1 ? "s" : "")
-            </small>
-        </div>
-
-        <!-- Skill Bars (top 3 for compact card) -->
-        @if (Model.Skills != null)
-        {
-            <div style="text-align:left; margin-top:12px;">
-                @foreach (var s in new[] {
-                        ("SHO", Model.Skills.Shooting),
-                        ("PAS", Model.Skills.Passing),
-                        ("DRI", Model.Skills.Dribbling) })
-                {
-                    <div class="d-flex align-items-center mb-1">
-                        <span style="width:32px;font-size:0.65rem;font-weight:700;color:#666;">@s.Item1</span>
-                        <div style="flex-grow:1; background:#eee; border-radius:4px; height:6px; overflow:hidden;">
-                            <div style="width:@(s.Item2)%; background:linear-gradient(90deg,#1F5C99,#5DADE2);
-                                  height:100%; border-radius:4px;"></div>
-                        </div>
-                        <span style="width:28px;text-align:right;font-size:0.7rem;font-weight:700;color:#333;">
-                            @s.Item2
-                        </span>
-                    </div>
-                }
+    <!-- Skills -->
+    @if (Model.Skills != null)
+    {
+        <div style="padding:12px 14px 4px;">
+            <div style="font-size:10px; color:#999; letter-spacing:0.8px;
+                            margin-bottom:8px;">
+                SKILLS
             </div>
-        }
 
-        <!-- Action Buttons -->
-        <div class="d-flex gap-2 mt-3">
-            <a asp-controller="Players" asp-action="Details" asp-route-id="@Model.PlayerId"
-               class="btn btn-primary btn-sm flex-grow-1 fw-bold">
-                View Card
+            @foreach (var skill in new[] {
+                ("SHO", Model.Skills.Shooting,   "#185FA5"),
+                ("PAS", Model.Skills.Passing,    "#0F6E56"),
+                ("DRI", Model.Skills.Dribbling,  "#854F0B")
+                })
+            {
+                <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                    <span style="font-size:10px; font-weight:700; color:#888; width:26px;">
+                        @skill.Item1
+                    </span>
+                    <div style="flex:1; height:5px; background:#eee;
+                                        border-radius:99px; overflow:hidden;">
+                        <div style="width:@(skill.Item2)%; height:100%;
+                                            background:@skill.Item3; border-radius:99px;"></div>
+                    </div>
+                    <span style="font-size:10px; font-weight:700; color:#333;
+                                         width:38px; text-align:right;">
+                        @skill.Item2<span style="color:#bbb; font-weight:400;">/100</span>
+                    </span>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Divider + Button -->
+    <div style="padding:10px 14px 14px;">
+        <div style="display:flex; gap:8px;">
+            <a asp-controller="Players" asp-action="Details"
+               asp-route-id="@Model.PlayerId"
+               style="flex:1; display:block; text-align:center;
+                      padding:9px 0; background:#0d2f52; color:#fff;
+                      border-radius:8px; font-size:12px; font-weight:700;
+                      text-decoration:none; letter-spacing:0.3px;">
+                View Full Card
             </a>
             @if (User.IsInRole("Admin"))
             {
-                <a asp-controller="Players" asp-action="Edit" asp-route-id="@Model.PlayerId"
-                   class="btn btn-outline-warning btn-sm">&#9998;</a>
-                <form asp-controller="Players" asp-action="Delete" asp-route-id="@Model.PlayerId"
-                      method="post" onsubmit="return confirm('Remove @Model.PlayerName from squad?');">
-                    <button class="btn btn-outline-danger btn-sm">&#128465;</button>
+                <a asp-controller="Players" asp-action="Edit"
+                   asp-route-id="@Model.PlayerId"
+                   style="display:flex; align-items:center; justify-content:center;
+                              width:36px; height:36px; border-radius:8px;
+                              border:1px solid #e0e0e0; color:#555;
+                              text-decoration:none; font-size:14px;">
+                    ✎
+                </a>
+                <form asp-controller="Players" asp-action="Delete"
+                      asp-route-id="@Model.PlayerId" method="post"
+                      onsubmit="return confirm('Remove @Model.PlayerName from the squad?');"
+                      style="margin:0;">
+                    <button style="width:36px; height:36px; border-radius:8px;
+                                       border:1px solid #ffd5d5; color:#c0392b;
+                                       background:#fff; cursor:pointer; font-size:14px;">
+                        ✕
+                    </button>
                 </form>
             }
         </div>
     </div>
+
 </div>

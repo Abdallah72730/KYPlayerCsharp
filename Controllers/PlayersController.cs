@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using KYPlayer.Areas.Identity.Data;
+using KYPlayer.Data;
+using KYPlayer.Models;
+using KYPlayer.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using KYPlayer.Data;
-using KYPlayer.Models;
-using Microsoft.AspNetCore.Authorization;
-using KYPlayer.Models.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace KYPlayer.Controllers
 {
@@ -16,10 +18,11 @@ namespace KYPlayer.Controllers
     public class PlayersController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public PlayersController(ApplicationDbContext context)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public PlayersController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Players
@@ -54,20 +57,28 @@ namespace KYPlayer.Controllers
         // GET: Players/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var player = await _context.Players
-                .FirstOrDefaultAsync(m => m.PlayerId == id);
-            if (player == null)
+                .Include(p => p.Skills)
+                .Include(p => p.Ratings)
+                .FirstOrDefaultAsync(p => p.PlayerId == id);
+            if (player == null) return NotFound();
+
+            // Check if the current fan has already rated this player
+            if (User.Identity!.IsAuthenticated && User.IsInRole("Fan"))
             {
-                return NotFound();
+                var userId = _userManager.GetUserId(User);
+                var existingRating = await _context.Ratings
+                    .FirstOrDefaultAsync(r => r.PlayerId == id && r.FanId == userId);
+
+                ViewData["AlreadyRated"] = existingRating != null;
+                ViewData["ExistingRatingValue"] = existingRating?.Value ?? 0;
             }
 
             return View(player);
         }
+
 
         [Authorize(Roles = "Admin")]
         public IActionResult Create() { return View(new PlayerCreateViewModel()); }
@@ -202,36 +213,31 @@ namespace KYPlayer.Controllers
         [Authorize(Roles ="Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
+            if (id == null) return NotFound();
             var player = await _context.Players
-                .FirstOrDefaultAsync(m => m.PlayerId == id);
-            if (player == null)
-            {
-                return NotFound();
-            }
-
+                .Include(p => p.Skills)
+                .FirstOrDefaultAsync(p => p.PlayerId == id);
+            if (player == null) return NotFound();
             return View(player);
+
         }
 
-        // POST: Players/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles ="Admin")]
+        // POST: Players/Delete/5 — actual delete
+        [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var player = await _context.Players.FindAsync(id);
             if (player != null)
             {
                 _context.Players.Remove(player);
+                // Cascade delete in DB handles Skills + Ratings automatically
+                await _context.SaveChangesAsync();
+                TempData["Success"] = $"{player.PlayerName} has been removed from the squad.";
             }
-
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool PlayerExists(int id)
         {

@@ -50,7 +50,7 @@ namespace KYPlayer.Controllers
             player.UpdatePSR();
 
             await _context.SaveChangesAsync();
-            TempData["Success"] = "Rating submitted!";
+                
             return RedirectToAction("Details", "Players", new { id = playerId });
         }
 

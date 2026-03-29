@@ -7,7 +7,7 @@
 <div style="background:linear-gradient(135deg,#1F5C99,#0d2f52);
              color:#fff; padding:70px 20px; text-align:center;
              border-radius:16px; margin-bottom:40px;">
-    <h1 style="font-size:3rem;font-weight:900;">&#9917; KYPlayer</h1>
+    <h1 style="font-size:3rem;font-weight:900;">KYPlayer</h1>
     <p style="font-size:1.3rem;opacity:0.85;max-width:600px;margin:0 auto 24px;">
         Know Your Players. Rate their performance. Follow the squad.
     </p>
@@ -20,17 +20,12 @@
                class="btn btn-outline-light btn-lg px-5">Login</a>
         </div>
     }
-    else
-    {
-        <a asp-controller="Players" asp-action="Index"
-           class="btn btn-light btn-lg fw-bold px-5">View the Squad &#8594;</a>
-    }
 </div>
 
 <!-- Top Rated Players -->
 @if (Model.Any())
 {
-    <h3 class="fw-bold mb-4 text-center">&#127942; Top Rated Players This Season</h3>
+    <h3 class="fw-bold mb-4 text-center">Top Rated Players This Season</h3>
     <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
         @foreach (var player in Model)
         {
@@ -38,9 +33,5 @@
                 @await Html.PartialAsync("_PlayerCard", player)
             </div>
         }
-    </div>
-    <div class="text-center">
-        <a asp-controller="Players" asp-action="Index"
-           class="btn btn-primary btn-lg px-5">View Full Squad</a>
     </div>
 }
