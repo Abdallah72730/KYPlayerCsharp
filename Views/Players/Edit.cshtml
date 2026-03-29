@@ -1,64 +1,97 @@
-﻿@model KYPlayer.Models.Player
-
+﻿@model KYPlayer.Models.ViewModels.PlayerEditViewModel
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = $"Edit — {Model.PlayerName}";
 }
 
-<h1>Edit</h1>
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header d-flex justify-content-between align-items-center
+               bg-warning">
+                <h4 class="mb-0">&#9998; Edit Player — #@Model.JerseyNumber @Model.PlayerName</h4>
+            </div>
+            <div class="card-body">
 
-<h4>Player</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="PlayerId" />
-            <div class="form-group">
-                <label asp-for="PlayerName" class="control-label"></label>
-                <input asp-for="PlayerName" class="form-control" />
-                <span asp-validation-for="PlayerName" class="text-danger"></span>
+                <!-- PSR Read-only -->
+                <div class="alert alert-info d-flex justify-content-between">
+                    <span>
+                        <strong>Current PSR:</strong>
+                        @Model.CurrentPSR.ToString("0.0") / 5.0
+                        (@Model.TotalRatingsCount ratings from fans)
+                    </span>
+                    <small class="text-muted">PSR is set by fan votes — not editable here.</small>
+                </div>
+
+                <form asp-action="Edit">
+                    <input type="hidden" asp-for="PlayerId" />
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <h5 class="text-primary border-bottom pb-2 mb-3">Player Information</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="PlayerName" class="form-label fw-bold"></label>
+                            <input asp-for="PlayerName" class="form-control" />
+                            <span asp-validation-for="PlayerName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-3">
+                            <label asp-for="JerseyNumber" class="form-label fw-bold"></label>
+                            <input asp-for="JerseyNumber" class="form-control" type="number" />
+                            <span asp-validation-for="JerseyNumber" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-3">
+                            <label asp-for="Age" class="form-label fw-bold"></label>
+                            <input asp-for="Age" class="form-control" type="number" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Position" class="form-label fw-bold"></label>
+                            <select asp-for="Position" class="form-select">
+                                @foreach (var pos in new[] { "Goalkeeper", "Defender", "Midfielder", "Forward" })
+                                {
+                                    <option>@pos</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="PhotoURL" class="form-label fw-bold"></label>
+                            <input asp-for="PhotoURL" class="form-control" />
+                        </div>
+                    </div>
+
+                    <!-- Skills -->
+                    <h5 class="text-primary border-bottom pb-2 mt-4 mb-3">Player Skills</h5>
+                    <div class="row g-3">
+                        @foreach (var skill in new[]{
+                                                ("Shooting",Model.Shooting),("Passing",Model.Passing),
+                                                ("Dribbling",Model.Dribbling),("Vision",Model.Vision),
+                                                ("Defense",Model.Defense),("Finishing",Model.Finishing)})
+                        {
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">@skill.Item1</label>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="range" name="@skill.Item1" min="1" max="100"
+                                           class="form-range flex-grow-1" value="@skill.Item2"
+                                           oninput="document.getElementById('e_@skill.Item1').innerText=this.value" />
+                                    <span id="e_@skill.Item1" class="badge bg-primary" style="min-width:40px">
+                                        @skill.Item2
+                                    </span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-warning px-5 fw-bold">Save Changes</button>
+                        <a asp-action="Details" asp-route-id="@Model.PlayerId"
+                           class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label asp-for="Age" class="control-label"></label>
-                <input asp-for="Age" class="form-control" />
-                <span asp-validation-for="Age" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="JerseyNumber" class="control-label"></label>
-                <input asp-for="JerseyNumber" class="form-control" />
-                <span asp-validation-for="JerseyNumber" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PhotoURL" class="control-label"></label>
-                <input asp-for="PhotoURL" class="form-control" />
-                <span asp-validation-for="PhotoURL" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CurrentPSR" class="control-label"></label>
-                <input asp-for="CurrentPSR" class="form-control" />
-                <span asp-validation-for="CurrentPSR" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TotalRatingsCount" class="control-label"></label>
-                <input asp-for="TotalRatingsCount" class="form-control" />
-                <span asp-validation-for="TotalRatingsCount" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Position" class="control-label"></label>
-                <input asp-for="Position" class="form-control" />
-                <span asp-validation-for="Position" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
 }
