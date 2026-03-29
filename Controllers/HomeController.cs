@@ -1,14 +1,23 @@
-using KYPlayer.Models;
+using KYPlayer.Data;
+using KYPlayer.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace KYPlayer.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly ApplicationDbContext _context;
+
+        public HomeController(ApplicationDbContext context) 
         {
-            return View();
+            _context = context;
+        }
+        public async Task<IActionResult> Index()
+        {
+            var featured = await _context.Players.Include(p => p.Skills).OrderByDescending(p => p.CurrentPSR).Take(3).ToListAsync();
+            return View(featured);
         }
 
         public IActionResult Privacy()

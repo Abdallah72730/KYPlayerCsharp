@@ -1,71 +1,37 @@
 ﻿@model IEnumerable<Player>
-@{ ViewData["Title"] = "Squad"; }
+@{
+    ViewData["Title"] = "Home"; Layout = "_Layout";
+}
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h2 class="fw-bold mb-0">
-            <span style="color:#1F5C99">&#9917;</span> The Squad
-        </h2>
-        <small class="text-muted">@Model.Count() players registered</small>
-    </div>
-    @if (User.IsInRole("Admin"))
+<!-- Hero Section -->
+<div style="background:linear-gradient(135deg,#1F5C99,#0d2f52);
+             color:#fff; padding:70px 20px; text-align:center;
+             border-radius:16px; margin-bottom:40px;">
+    <h1 style="font-size:3rem;font-weight:900;">&#9917; KYPlayer</h1>
+    <p style="font-size:1.3rem;opacity:0.85;max-width:600px;margin:0 auto 24px;">
+        Know Your Players. Rate their performance. Follow the squad.
+    </p>
+    @if (!User.Identity!.IsAuthenticated)
     {
-        <a asp-action="Create" class="btn btn-success px-4 py-2 fw-bold">
-            &#43; Add Player
-        </a>
+        <div class="d-flex gap-3 justify-content-center">
+            <a asp-area="Identity" asp-page="/Account/Register"
+               class="btn btn-light btn-lg fw-bold px-5">Join Now</a>
+            <a asp-area="Identity" asp-page="/Account/Login"
+               class="btn btn-outline-light btn-lg px-5">Login</a>
+        </div>
+    }
+    else
+    {
+        <a asp-controller="Players" asp-action="Index"
+           class="btn btn-light btn-lg fw-bold px-5">View the Squad &#8594;</a>
     }
 </div>
 
-<!-- Search & Filter Bar -->
-<form method="get" class="card card-body shadow-sm mb-4 p-3">
-    <div class="row g-2 align-items-center">
-        <div class="col-md-5">
-            <input type="text" name="searchQuery" class="form-control"
-                   placeholder="&#128269; Search by name or #jersey..."
-                   value="@ViewData["SearchQuery"]" />
-        </div>
-        <div class="col-md-3">
-            <select name="positionFilter" class="form-select">
-                <option value="">All Positions</option>
-                @foreach (var pos in new[]{ "Goalkeeper","Defender","Midfielder","Forward" })
-                {
-                    <option value="@pos" @(ViewData["PositionFilter"]?.ToString()==pos?"selected":"")>
-                        @pos
-                    </option>
-                }
-            </select>
-        </div>
-        <div class="col-md-2">
-            <select name="sortBy" class="form-select">
-                <option value="">Sort by...</option>
-                <option value="psr_desc">PSR: High to Low</option>
-                <option value="psr_asc">PSR: Low to High</option>
-                <option value="name">Name A-Z</option>
-                <option value="jersey">Jersey Number</option>
-            </select>
-        </div>
-        <div class="col-md-1">
-            <button type="submit" class="btn btn-primary w-100">Go</button>
-        </div>
-        <div class="col-md-1">
-            <a asp-action="Index" class="btn btn-outline-secondary w-100">Clear</a>
-        </div>
-    </div>
-</form>
-
-@if (!Model.Any())
+<!-- Top Rated Players -->
+@if (Model.Any())
 {
-    <div class="text-center py-5 text-muted">
-        <h4>No players found.</h4>
-        @if (User.IsInRole("Admin"))
-        {
-            <a asp-action="Create" class="btn btn-success mt-3">Add the first player</a>
-        }
-    </div>
-}
-else
-{
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    <h3 class="fw-bold mb-4 text-center">&#127942; Top Rated Players This Season</h3>
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
         @foreach (var player in Model)
         {
             <div class="col">
@@ -73,5 +39,8 @@ else
             </div>
         }
     </div>
+    <div class="text-center">
+        <a asp-controller="Players" asp-action="Index"
+           class="btn btn-primary btn-lg px-5">View Full Squad</a>
+    </div>
 }
-    
