@@ -19,23 +19,27 @@ namespace KYPlayer.Data
         {
             base.OnModelCreating(builder);
 
-            //One player has one PlayerSkills
+            // One Player has one PlayerSkills (cascade: delete skills when player deleted)
             builder.Entity<Player>()
                 .HasOne(p => p.Skills)
                 .WithOne(s => s.Player)
-                .HasForeignKey<PlayerSkills>(s => s.PlayerId);
+                .HasForeignKey<PlayerSkills>(s => s.PlayerId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            //One player has Many Ratings
+            // One Player can have many ratings (cascade: delete all ratings when player deleted)
             builder.Entity<Rating>()
                 .HasOne(r => r.Player)
                 .WithMany(p => p.Ratings)
-                .HasForeignKey(r => r.PlayerId);
+                .HasForeignKey(r => r.PlayerId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            //One Fan has Many Ratings
+            // One fan can have many ratings, but deleting a fan should not delete the ratings (restrict)
             builder.Entity<Rating>()
                 .HasOne(r => r.Fan)
                 .WithMany(u => u.Ratings)
-                .HasForeignKey(r => r.FanId);   
+                .HasForeignKey(r => r.FanId)
+                .OnDelete(DeleteBehavior.Restrict);
+
 
         }
     }
