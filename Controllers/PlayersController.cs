@@ -101,7 +101,7 @@ namespace KYPlayer.Controllers
                 Age = vm.Age,
                 JerseyNumber = vm.JerseyNumber,
                 Position = vm.Position,
-                PhotoURL = vm.PhotoURL ?? "/images/default-player.png",
+                PhotoURL = vm.PhotoURL,
                 CurrentPSR = 0,    
                 TotalRatingsCount = 0,
                 Skills = new PlayerSkills

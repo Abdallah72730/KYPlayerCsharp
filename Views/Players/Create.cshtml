@@ -57,17 +57,17 @@
                     </p>
                     <div class="row g-3">
                         @foreach (var skill in new[] {
-                                                ("Shooting","&#127919;"), ("Passing","&#128257;"),
-                                                ("Dribbling","&#9917;"), ("Vision","&#128065;"),
-                                                ("Defense","&#129354;"), ("Finishing","&#127919;") })
+                                                ("Shooting"), ("Passing"),
+                                                ("Dribbling"), ("Vision"),
+                                                ("Defense"), ("Finishing") })
                         {
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">@skill.Item2 @skill.Item1</label>
+                                <label class="form-label fw-bold"> @skill</label>
                                 <div class="d-flex align-items-center gap-2">
-                                    <input type="range" name="@skill.Item1" min="1" max="100"
+                                    <input type="range" name="@skill" min="1" max="100"
                                            class="form-range flex-grow-1" value="50"
-                                           oninput="document.getElementById('lbl_@skill.Item1').innerText=this.value" />
-                                    <span id="lbl_@skill.Item1" class="badge bg-primary" style="min-width:40px">50</span>
+                                           oninput="document.getElementById('lbl_@skill').innerText=this.value" />
+                                    <span id="lbl_@skill" class="badge bg-primary" style="min-width:40px">50</span>
                                 </div>
                             </div>
                         }

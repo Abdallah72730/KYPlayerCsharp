@@ -34,7 +34,7 @@ else
                     @foreach (var r in Model)
                     {
                         <tr>
-                            <td class="text-muted">@row++</td>
+                            <td class="text-muted">@row</td>
                             <td>@r.Fan?.UserName</td>
                             <td>
                                 <a asp-controller="Players" asp-action="Details" asp-route-id="@r.PlayerId">

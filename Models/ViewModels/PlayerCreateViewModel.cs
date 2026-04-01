@@ -33,9 +33,5 @@ namespace KYPlayer.Models.ViewModels
         [Range(1, 100)] public int Vision { get; set; } = 50;
         [Range(1, 100)] public int Defense { get; set; } = 50;
         [Range(1, 100)] public int Finishing { get; set; } = 50;
-
-
-
-
     }
 }

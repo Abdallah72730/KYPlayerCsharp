@@ -23,9 +23,13 @@ namespace KYPlayer.Models
 
         public void UpdatePSR() 
         {
-            if (Ratings != null && Ratings.Any()) 
+            if (Ratings != null && Ratings.Any())
             {
                 CurrentPSR = (float)Ratings.Average(r => r.Value);
+            }
+            else 
+            {
+                CurrentPSR = 0.0f;
             }
         }
 

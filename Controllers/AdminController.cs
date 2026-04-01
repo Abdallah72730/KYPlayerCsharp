@@ -62,7 +62,7 @@ namespace KYPlayer.Controllers
                 var player = await _context.Players
                     .Include(p => p.Ratings)
                     .FirstOrDefaultAsync(p => p.PlayerId == rating.PlayerId);
-                player.TotalRatingsCount = player.Ratings.Count - 1;
+                player.TotalRatingsCount = player.Ratings.Count;
                 player.UpdatePSR();
                 await _context.SaveChangesAsync();
             }
@@ -89,6 +89,7 @@ namespace KYPlayer.Controllers
         {
             var players = await _context.Players
                 .Include(p => p.Ratings)
+                .Include(p => p.Skills)
                 .OrderByDescending(p => p.CurrentPSR)
                 .ToListAsync();
             return View(players);
@@ -99,6 +100,7 @@ namespace KYPlayer.Controllers
         {
             var player = await _context.Players
                 .Include(p => p.Ratings)
+                .Include(p => p.Skills)
                 .FirstOrDefaultAsync(p => p.PlayerId == playerId);
             var report = new Report
             {
